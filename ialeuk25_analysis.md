@@ -26,7 +26,7 @@ cpdata <- read_csv(filename)
 
 This document contains analysis by year. Future analysis could examine contribution attributes by:
 
-- author affiliation (e.g. do NGOs conduct studies are particular scales?)
+- author affiliation (e.g. do NGOs conduct studies at particular scales?)
 - landscape type (e.g. what species do studies in Urban landscapes focus on?) 
 - species (e.g. are birds studied more using empirical studies or GIS?) 
 
@@ -45,27 +45,7 @@ yrdata <- cpdata %>%
 
 
 
-```r
-#spec(cpdata)
-
-affildata <- yrdata %>%
-   mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Affiliation, value = count, Academic:Private) %>%
-  mutate(prop = count / yrsum)  %>% #calculate proportion
-  group_by(`Affiliation`) %>%
-  summarise_all(sum, na.rm=T) 
-
-#lspAffil <- affildata %>%
-#  select(Affiliation,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) #%>%
-  #mutate(yrsum = rowSums(.[2:8])) %>%
-  #gather(key = Type, value = count, -Affiliation, -yrsum) %>%
-  #mutate(prop = count / yrsum) 
-
-#ggplot(lspAffil, aes(x=Affiliation, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white") + scale_y_continuous(labels=percent_format())
-```
-
-
-**Total Conference Contributions**
+## Total Conference Contributions
 
 Quick observations:
 
@@ -81,12 +61,14 @@ authorCounts <- yrdata %>%
 ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identity")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
+
+## Analysis by Conference Year
 
 Stacked bar plots of contributions (by types and year)
 
-**Author Affiliation**
+### Author Affiliation
 
 Quick observations:
 
@@ -106,21 +88,21 @@ authorCounts <- yrdata %>%
 ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
 ggplot(authorCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
 
 ```r
 ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
 
-**Landscape Type**
+### Landscape Type
 
 Quick observations:
 
@@ -139,21 +121,21 @@ lspCounts <- yrdata %>%
 ggplot(lspCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
 ggplot(lspCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
 
 ```r
 ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
-**Species**
+### Species
 
 Quick observations:
 
@@ -170,21 +152,21 @@ sppCounts <- yrdata %>%
 ggplot(sppCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 ggplot(sppCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 ```r
 ggplot(sppCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
 
-**Methods**
+### Methods
 
 Quick observations:
 
@@ -202,21 +184,21 @@ methodsCounts <- yrdata %>%
 ggplot(methodsCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ```r
 ggplot(methodsCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 ```r
 ggplot(methodsCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
 
-**Spatial Extent**
+### Spatial Extent
 
 Quick observations:
 
@@ -233,30 +215,30 @@ extentCounts <- yrdata %>%
 ggplot(extentCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 ggplot(extentCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 ggplot(extentCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 
-**Temporal Extent**
+### Temporal Extent
 
 Quick observations:
 
 - most studies have undefined temporal duration
 - those that do are dominated by studies over decades and years 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
 
-**Concepts**
+### Concepts
 
 Quick observations:
 
@@ -277,21 +259,21 @@ conceptCounts <- yrdata %>%
 ggplot(conceptCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 ```r
 ggplot(conceptCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
 
 ```r
 ggplot(conceptCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
 
-**Concepts**
+### Other Concepts
 
 Quick observations:
 
@@ -310,16 +292,102 @@ othCCounts <- yrdata %>%
 ggplot(othCCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 ```r
 ggplot(othCCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
 
 ```r
 ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
+
+
+## Analysis by Author Affiliation
+
+
+```r
+#spec(cpdata)
+
+affildata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Affiliation, value = count, Academic:Private) %>%
+  filter(count > 0) %>%
+  group_by(`Affiliation`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+### Total Conference Contributions
+
+Quick observations:
+
+- Academic contributors dominate, followed by Government (but as shown above, Government contributions have decreased recently, replaced by NGOs)
+
+
+```r
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+### Landscape Type 
+
+Stacked bar plots of contributions (by types and author affiliation)
+
+#### Using all landscape types
+
+Quick observations:
+
+- Business not good at reporting landscape type!
+- Private have greatest proportions of Seascape and Other
+
+
+```r
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
+```r
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+
+#### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- Government has greatest proportion of Upland Rural
+- Business has greatest Urban proportion and smallest Lowland Rural proportion
+- Academic dominates total number of all landscape types (with possible exception of Upland Rural)
+
+
+```r
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+```r
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+

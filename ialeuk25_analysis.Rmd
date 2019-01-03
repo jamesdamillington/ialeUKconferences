@@ -44,7 +44,7 @@ yrdata <- cpdata %>%
 
 
 
-# Total Conference Contributions
+## Total Conference Contributions
 
 Quick observations:
 
@@ -61,11 +61,11 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identit
 ```
 
 
-# Analysis by Conference Year
+## Analysis by Conference Year
 
 Stacked bar plots of contributions (by types and year)
 
-## Author Affiliation
+### Author Affiliation
 
 Quick observations:
 
@@ -90,7 +90,7 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(sta
 
 ```
 
-## Landscape Type
+### Landscape Type
 
 Quick observations:
 
@@ -113,7 +113,7 @@ ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ```
 
-## Species
+### Species
 
 Quick observations:
 
@@ -134,7 +134,7 @@ ggplot(sppCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ```
 
-## Methods
+### Methods
 
 Quick observations:
 
@@ -156,7 +156,7 @@ ggplot(methodsCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(st
 
 ```
 
-## Spatial Extent
+### Spatial Extent
 
 Quick observations:
 
@@ -178,7 +178,7 @@ ggplot(extentCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(sta
 ```
 
 
-## Temporal Extent
+### Temporal Extent
 
 Quick observations:
 
@@ -200,7 +200,7 @@ ggplot(temporalCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(s
 
 ```
 
-## Concepts
+### Concepts
 
 Quick observations:
 
@@ -225,7 +225,7 @@ ggplot(conceptCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(st
 
 ```
 
-## Other Concepts
+### Other Concepts
 
 Quick observations:
 
@@ -249,9 +249,7 @@ ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat=
 ```
 
 
-# Analysis by Author Affiliation
-
-Stacked bar plots of contributions (by types and author affiliation)
+## Analysis by Author Affiliation
 
 ```{r}
 #spec(cpdata)
@@ -264,7 +262,11 @@ affildata <- cpdata %>%
   summarise_all(sum, na.rm=T) 
 ```
 
-##Total Conference Contributions
+### Total Conference Contributions
+
+Quick observations:
+
+- Academic contributors dominate, followed by Government (but as shown above, Government contributions have decreased recently, replaced by NGOs)
 
 ```{r}
 
@@ -278,9 +280,11 @@ ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
 
 ```
 
-## Landscape Type 
+### Landscape Type 
 
-### Using all landscape types
+Stacked bar plots of contributions (by types and author affiliation)
+
+#### Using all landscape types
 
 Quick observations:
 
@@ -294,7 +298,7 @@ ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="id
 ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-### Without 'Undefined LspType' and 'Other' landscape types
+#### Without 'Undefined LspType' and 'Other' landscape types
 
 Quick observations:
 
