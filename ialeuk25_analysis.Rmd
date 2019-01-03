@@ -2,11 +2,11 @@
 title: "analysis of ialeUK conference proceedings"
 author: "James Millington"
 output:
-  pdf_document: default
   html_document:
     code_folding: hide
     df_print: paged
     keep_md: yes
+  pdf_document: default
 ---
 
 
@@ -17,7 +17,7 @@ output:
 rm(list=ls())
 library(tidyverse)
 library(ggplot2)
-path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/"
+path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/Rproject"
 setwd(path)
 filename <- "abstract_review_export_2018-06-11.csv"
 cpdata <- read_csv(filename)
@@ -25,7 +25,7 @@ cpdata <- read_csv(filename)
 
 This document contains analysis by year. Future analysis could examine contribution attributes by:
 
-- author affiliation (e.g. do NGOs conduct studies are particular scales?)
+- author affiliation (e.g. do NGOs conduct studies at particular scales?)
 - landscape type (e.g. what species do studies in Urban landscapes focus on?) 
 - species (e.g. are birds studied more using empirical studies or GIS?) 
 
@@ -42,26 +42,6 @@ yrdata <- cpdata %>%
 
 ```
 
-
-```{r}
-#spec(cpdata)
-
-affildata <- yrdata %>%
-   mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Affiliation, value = count, Academic:Private) %>%
-  mutate(prop = count / yrsum)  %>% #calculate proportion
-  group_by(`Affiliation`) %>%
-  summarise_all(sum, na.rm=T) 
-
-#lspAffil <- affildata %>%
-#  select(Affiliation,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) #%>%
-  #mutate(yrsum = rowSums(.[2:8])) %>%
-  #gather(key = Type, value = count, -Affiliation, -yrsum) %>%
-  #mutate(prop = count / yrsum) 
-
-#ggplot(lspAffil, aes(x=Affiliation, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white") + scale_y_continuous(labels=percent_format())
-
-```
 
 
 **Total Conference Contributions**
@@ -265,3 +245,47 @@ ggplot(othCCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat
 ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
+
+
+
+```{r}
+#spec(cpdata)
+
+affildata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Affiliation, value = count, Academic:Private) %>%
+  filter(count > 0) %>%
+  group_by(`Affiliation`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+```{r}
+
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+
+```{r}
+
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+

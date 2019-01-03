@@ -1,11 +1,12 @@
 ---
 title: "analysis of ialeUK conference proceedings"
 author: "James Millington"
-output: 
-  html_document: 
-    keep_md: yes
+output:
+  html_document:
     code_folding: hide
     df_print: paged
+    keep_md: yes
+  pdf_document: default
 ---
 
 
@@ -17,7 +18,7 @@ output:
 rm(list=ls())
 library(tidyverse)
 library(ggplot2)
-path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/"
+path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/Rproject"
 setwd(path)
 filename <- "abstract_review_export_2018-06-11.csv"
 cpdata <- read_csv(filename)
@@ -42,6 +43,28 @@ yrdata <- cpdata %>%
   summarise_all(sum, na.rm=T) 
 ```
 
+
+
+```r
+#spec(cpdata)
+
+affildata <- yrdata %>%
+   mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Affiliation, value = count, Academic:Private) %>%
+  mutate(prop = count / yrsum)  %>% #calculate proportion
+  group_by(`Affiliation`) %>%
+  summarise_all(sum, na.rm=T) 
+
+#lspAffil <- affildata %>%
+#  select(Affiliation,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) #%>%
+  #mutate(yrsum = rowSums(.[2:8])) %>%
+  #gather(key = Type, value = count, -Affiliation, -yrsum) %>%
+  #mutate(prop = count / yrsum) 
+
+#ggplot(lspAffil, aes(x=Affiliation, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white") + scale_y_continuous(labels=percent_format())
+```
+
+
 **Total Conference Contributions**
 
 Quick observations:
@@ -58,7 +81,7 @@ authorCounts <- yrdata %>%
 ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identity")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 
 Stacked bar plots of contributions (by types and year)
@@ -83,19 +106,19 @@ authorCounts <- yrdata %>%
 ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
 ggplot(authorCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
 
 ```r
 ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
 **Landscape Type**
 
@@ -116,19 +139,19 @@ lspCounts <- yrdata %>%
 ggplot(lspCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 ggplot(lspCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 ```r
 ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
 
 **Species**
 
@@ -147,19 +170,19 @@ sppCounts <- yrdata %>%
 ggplot(sppCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ```r
 ggplot(sppCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 ```r
 ggplot(sppCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
 
 **Methods**
 
@@ -179,19 +202,19 @@ methodsCounts <- yrdata %>%
 ggplot(methodsCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 ggplot(methodsCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 ggplot(methodsCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 **Spatial Extent**
 
@@ -210,19 +233,19 @@ extentCounts <- yrdata %>%
 ggplot(extentCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ```r
 ggplot(extentCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
 
 ```r
 ggplot(extentCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
 
 
 **Temporal Extent**
@@ -231,31 +254,7 @@ Quick observations:
 
 - most studies have undefined temporal duration
 - those that do are dominated by studies over decades and years 
-
-```r
-temporalCounts <- yrdata %>%
-  select(`Conference Year`, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
-) %>%
-  mutate(yrsum = rowSums(.[2:10])) %>%
-  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
-  mutate(prop = count / yrsum) 
-
-ggplot(temporalCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
-```
-
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
-
-```r
-ggplot(temporalCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
-```
-
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
-
-```r
-ggplot(temporalCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
-```
-
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
 
 **Concepts**
 
@@ -278,19 +277,19 @@ conceptCounts <- yrdata %>%
 ggplot(conceptCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 ```r
 ggplot(conceptCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
 
 ```r
 ggplot(conceptCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
 
 **Concepts**
 
@@ -311,16 +310,16 @@ othCCounts <- yrdata %>%
 ggplot(othCCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ```r
 ggplot(othCCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
 
 ```r
 ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
-![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-12-3.png)<!-- -->
