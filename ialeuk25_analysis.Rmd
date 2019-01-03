@@ -44,7 +44,7 @@ yrdata <- cpdata %>%
 
 
 
-**Total Conference Contributions**
+# Total Conference Contributions
 
 Quick observations:
 
@@ -61,9 +61,11 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identit
 ```
 
 
+# Analysis by Conference Year
+
 Stacked bar plots of contributions (by types and year)
 
-**Author Affiliation**
+## Author Affiliation
 
 Quick observations:
 
@@ -88,7 +90,7 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(sta
 
 ```
 
-**Landscape Type**
+## Landscape Type
 
 Quick observations:
 
@@ -111,7 +113,7 @@ ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ```
 
-**Species**
+## Species
 
 Quick observations:
 
@@ -132,7 +134,7 @@ ggplot(sppCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ```
 
-**Methods**
+## Methods
 
 Quick observations:
 
@@ -154,7 +156,7 @@ ggplot(methodsCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(st
 
 ```
 
-**Spatial Extent**
+## Spatial Extent
 
 Quick observations:
 
@@ -176,7 +178,7 @@ ggplot(extentCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(sta
 ```
 
 
-**Temporal Extent**
+## Temporal Extent
 
 Quick observations:
 
@@ -198,7 +200,7 @@ ggplot(temporalCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(s
 
 ```
 
-**Concepts**
+## Concepts
 
 Quick observations:
 
@@ -223,7 +225,7 @@ ggplot(conceptCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(st
 
 ```
 
-**Concepts**
+## Other Concepts
 
 Quick observations:
 
@@ -247,6 +249,9 @@ ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat=
 ```
 
 
+# Analysis by Author Affiliation
+
+Stacked bar plots of contributions (by types and author affiliation)
 
 ```{r}
 #spec(cpdata)
@@ -259,6 +264,8 @@ affildata <- cpdata %>%
   summarise_all(sum, na.rm=T) 
 ```
 
+##Total Conference Contributions
+
 ```{r}
 
 lspACounts <- affildata %>%
@@ -269,11 +276,31 @@ lspACounts <- affildata %>%
 
 ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
 
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations:
+
+- Business not good at reporting landscape type!
+- Private have greatest proportions of Seascape and Other
+
+```{r}
+
 ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- Government has greatest proportion of Upland Rural
+- Business has greatest Urban proportion and smallest Lowland Rural proportion
+- Academic dominates total number of all landscape types (with possible exception of Upland Rural)
 
 ```{r}
 
