@@ -701,3 +701,5 @@ ggplot(spatiallspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="ide
 ```
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
+
+## More here

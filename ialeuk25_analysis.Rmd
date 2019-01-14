@@ -577,3 +577,5 @@ ggplot(spatiallspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="id
 ggplot(spatiallspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
+
+## More here
