@@ -3,10 +3,20 @@ title: "analysis of ialeUK conference proceedings"
 author: "James Millington"
 output:
   html_document:
+    number_sections: yes
+    toc: yes
     code_folding: hide
     df_print: paged
     keep_md: yes
-  pdf_document: default
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+linkcolor: red
+citecolor: cyan
+urlcolor: blue
 ---
 
 
@@ -45,7 +55,7 @@ yrdata <- cpdata %>%
 
 
 
-## Total Conference Contributions
+# Total Conference Contributions
 
 Quick observations:
 
@@ -64,11 +74,11 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identit
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 
-## Analysis by Conference Year
+# Analysis by Conference Year
 
 Stacked bar plots of contributions (by types and year)
 
-### Author Affiliation
+## Author Affiliation
 
 Quick observations:
 
@@ -102,7 +112,7 @@ ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(sta
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
 
-### Landscape Type
+## Landscape Type
 
 Quick observations:
 
@@ -135,7 +145,7 @@ ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
-### Species
+## Species
 
 Quick observations:
 
@@ -307,7 +317,7 @@ ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat=
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
 
 
-## Analysis by Author Affiliation
+# Analysis by Author Affiliation
 
 
 ```r
@@ -340,11 +350,11 @@ ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
-### Landscape Type 
+## Landscape Type 
 
 Stacked bar plots of contributions (by types and author affiliation)
 
-#### Using all landscape types
+### Using all landscape types
 
 Quick observations:
 
@@ -364,7 +374,7 @@ ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="ide
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
 
-#### Without 'Undefined LspType' and 'Other' landscape types
+### Without 'Undefined LspType' and 'Other' landscape types
 
 Quick observations:
 
@@ -393,7 +403,7 @@ ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="ide
 
 
 
-### Species
+## Species
 
 Quick observations
 
@@ -421,7 +431,7 @@ ggplot(speciesACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat=
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
 
 
-### Methods
+## Methods
 
 Quick observations
 
@@ -450,7 +460,7 @@ ggplot(methodsACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat=
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
 
-### Spatial Extent
+## Spatial Extent
 
 Quick observations
 
@@ -479,7 +489,7 @@ ggplot(spatialACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat=
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-18-2.png)<!-- -->
 
-### Temporal Extent
+## Temporal Extent
 
 Quick observations
 
@@ -506,7 +516,7 @@ ggplot(temporalACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
 
-### Concepts
+## Concepts
 
 Quick observations
 
@@ -534,7 +544,7 @@ ggplot(conceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat=
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
 
-### Other Concepts
+## Other Concepts
 
 Quick observations
 
@@ -560,3 +570,134 @@ ggplot(oconceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat
 ```
 
 ![](ialeuk25_analysis_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
+
+# Analysis by Landscape Type
+
+
+```r
+#spec(cpdata)
+
+lspdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = LspType, value = count, `Upland rural`:Other) %>%
+  filter(count > 0) %>%
+  group_by(`LspType`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+Quick observations:
+
+- Lowland rural dominate, followed by 'undefined' and Upland rural
+
+
+```r
+AlspCounts <- lspdata %>%
+  select(LspType,Academic, Government,NGO,Business,Private) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(AlspCounts, aes(x=LspType, y=count)) + geom_bar(stat="identity")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+
+## Author Affiliation
+
+Quick observations:
+
+- Academic are majority of all landscape types, with possible exception of Upland rural (Government?)
+- 
+
+
+```r
+ggplot(AlspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+```r
+ggplot(AlspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
+
+## Species
+Quick observations
+
+- Animal types quite evenly distributed across Lowland rural
+- Humans are large contributor to seascape studies (possibly by absolute number as well as relative)
+- Generic habitat is large contributor across all landscape types
+
+
+```r
+specieslspCounts <- lspdata %>%
+  select(LspType,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(specieslspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
+```r
+ggplot(specieslspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
+
+## Methods
+
+Quick observations
+
+- 'Undefined landscape' studies are largely theoretical
+- Lowland rural largely studies using empirical and quantitative methods
+- Seascape studies have largest proportion of qualitative methods
+
+
+
+```r
+methodslspCounts <- lspdata %>%
+  select(LspType,Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Asum = rowSums(.[2:7])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(methodslspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
+```r
+ggplot(methodslspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
+
+## Spatial Extent
+
+Quick observations
+
+- Urban landscape studies are dominated by Local scale analysis
+- Upland rural have larger proportion of national studies than Lowland rural
+
+
+```r
+spatiallspCounts <- lspdata %>%
+  select(LspType,Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Asum = rowSums(.[2:9])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(spatiallspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+```r
+ggplot(spatiallspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+![](ialeuk25_analysis_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
