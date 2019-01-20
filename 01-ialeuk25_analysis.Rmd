@@ -1,23 +1,5 @@
----
-title: "analysis of ialeUK conference proceedings"
-author: "James Millington"
-output:
-  html_document:
-    number_sections: yes
-    toc: yes
-    code_folding: hide
-    df_print: paged
-    keep_md: yes
-  pdf_document:
-    highlight: tango
-    number_sections: yes
-    toc: yes
-  word_document:
-    toc: yes
-linkcolor: red
-citecolor: cyan
-urlcolor: blue
----
+# Total Conference Contributions
+
 
 
 ```{r results='hide', warning=F, message=F}
@@ -54,7 +36,7 @@ yrdata <- cpdata %>%
 
 
 
-# Total Conference Contributions
+
 
 Quick observations:
 
@@ -272,7 +254,7 @@ affildata <- cpdata %>%
   summarise_all(sum, na.rm=T) 
 ```
 
-### Total Conference Contributions
+## Total Conference Contributions
 
 Quick observations:
 

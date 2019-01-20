@@ -1,0 +1,16 @@
+---
+title: "ialeUK 25 Years of Conferences"
+author: "James Millington"
+date: "20 January 2019"
+site: "bookdown::bookdown_site"
+output:
+  bookdown::gitbook: default
+documentclass: book
+link-citations: yes
+---
+
+# Overview
+
+Insert preamble here. 
+
+Use table of contents (e.g. in the panel on the left) to navigate the book. 

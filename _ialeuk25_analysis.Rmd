@@ -1,0 +1,582 @@
+---
+title: "analysis of ialeUK conference proceedings"
+author: "James Millington"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    code_folding: hide
+    df_print: paged
+    keep_md: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+linkcolor: red
+citecolor: cyan
+urlcolor: blue
+---
+
+# Total Conference Contributions
+
+```{r results='hide', warning=F, message=F}
+#Load Data
+#(After slightly cleaning column titles - in future include code to do that here)
+
+rm(list=ls())
+library(tidyverse)
+library(ggplot2)
+path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/Rproject"
+setwd(path)
+filename <- "abstract_review_export_2018-06-11.csv"
+cpdata <- read_csv(filename)
+```
+
+This document contains analysis by year. Future analysis could examine contribution attributes by:
+
+- author affiliation (e.g. do NGOs conduct studies at particular scales?)
+- landscape type (e.g. what species do studies in Urban landscapes focus on?) 
+- species (e.g. are birds studied more using empirical studies or GIS?) 
+
+etc.
+
+
+```{r}
+#spec(cpdata)
+
+yrdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  group_by(`Conference Year`) %>%
+  summarise_all(sum, na.rm=T) 
+
+```
+
+
+
+
+
+Quick observations:
+
+- general increase through time to early 2000s then drop but steady through 2010s
+```{r}
+authorCounts <- yrdata %>%
+  select(`Conference Year`,Academic, Government,NGO,Business,Private) %>%
+  mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum)  #calculate proportion
+
+ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identity")
+
+```
+
+
+# Analysis by Conference Year
+
+Stacked bar plots of contributions (by types and year)
+
+## Author Affiliation
+
+Quick observations:
+
+- Academic contributors generally dominate
+- Government contributors have decreased through time
+- NGO attendance has replaced declines in Government? (could check sum of Gov + NGO through time)
+
+```{r}
+authorCounts <- yrdata %>%
+  select(`Conference Year`,Academic, Government,NGO,Business,Private) %>%
+  mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum)  #calculate proportion
+
+
+ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(authorCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authorCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+
+```
+
+## Landscape Type
+
+Quick observations:
+
+- Lowland rural generaly dominates (but lesser contribution in later years)
+- Spikes in some years for types (corresponding to special themes)
+- Urban and Seascape both appear for first time in 1998; urban then constant presence, but seascape more variable until recent years 
+```{r}
+lspCounts <- yrdata %>%
+  select(`Conference Year`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(yrsum = rowSums(.[2:8])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+
+ggplot(lspCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(lspCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Species
+
+Quick observations:
+
+- no clear patterns
+- some years contain no Generic Habitat - is this real or a data entry issue?
+```{r}
+sppCounts <- yrdata %>%
+  select(`Conference Year`,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(yrsum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(sppCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(sppCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(sppCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Methods
+
+Quick observations:
+
+- empirical studies have decreased through time
+- GIS and qualitative have increased through time
+- Quantitative and theoretical quite steady through time (although theoretical does seem to have reduced after initial years)
+```{r}
+methodsCounts <- yrdata %>%
+  select(`Conference Year`, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(yrsum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(methodsCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(methodsCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodsCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Spatial Extent
+
+Quick observations:
+
+- no clear trends?
+- Global studies only appear from 2014 onwards
+```{r}
+extentCounts <- yrdata %>%
+  select(`Conference Year`, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(yrsum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(extentCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(extentCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(extentCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+### Temporal Extent
+
+Quick observations:
+
+- most studies have undefined temporal duration
+- those that do are dominated by studies over decades and years 
+```{r echo=F}
+temporalCounts <- yrdata %>%
+  select(`Conference Year`, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(yrsum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(temporalCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(temporalCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Concepts
+
+Quick observations:
+
+- Ecosystem services appear from 1998 and have grown recently
+- climate change interactions have only become common recently (since 2008)
+- 'Scale and scaling' and 'connectivity and fragmentation seem to have decreased oin recent years
+- LUCC and Spatial Analysis are mainstays throughout
+```{r}
+conceptCounts <- yrdata %>%
+  select(`Conference Year`, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(yrsum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(conceptCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(conceptCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Other Concepts
+
+Quick observations:
+
+- socio-economic studies have increased through time
+- biodiversity has decreased through time
+- Landscape management and Biodiversity peak in early 2000s
+```{r}
+othCCounts <- yrdata %>%
+  select(`Conference Year`, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(yrsum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(othCCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
+
+ggplot(othCCounts, aes(x=`Conference Year`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(othCCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+# Analysis by Author Affiliation
+
+```{r}
+#spec(cpdata)
+
+affildata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Affiliation, value = count, Academic:Private) %>%
+  filter(count > 0) %>%
+  group_by(`Affiliation`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+### Total Conference Contributions
+
+Quick observations:
+
+- Academic contributors dominate, followed by Government (but as shown above, Government contributions have decreased recently, replaced by NGOs)
+
+```{r}
+
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
+
+```
+
+## Landscape Type 
+
+Stacked bar plots of contributions (by types and author affiliation)
+
+### Using all landscape types
+
+Quick observations:
+
+- Business not good at reporting landscape type!
+- Private have greatest proportions of Seascape and Other
+
+```{r}
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- Government has greatest proportion of Upland Rural
+- Business has greatest Urban proportion and smallest Lowland Rural proportion
+- Academic dominates total number of all landscape types (with possible exception of Upland Rural)
+
+```{r}
+
+lspACounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+
+## Species
+
+Quick observations
+
+- Academic seem to be majority by absolute number for all species
+- Business and Private have greatest proportions of Generic Habitat
+- NGOs have greatest proportion of Birds (RSPB?)
+
+```{r}
+
+speciesACounts <- affildata %>%
+  select(`Affiliation`,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(speciesACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(speciesACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Methods
+
+Quick observations
+
+- Academic seem to be majority by absolute number for all methods
+- Business obviously lower proportion of empirical studies (expensive?), substituted by GIS and qualitative
+- Government has smallest proportion of qualitative
+- Private has greatest proprtion of theoretical, no RS and relatively little GIS (technical training?)
+
+
+```{r}
+
+methodsACounts <- affildata %>%
+  select(`Affiliation`,Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Asum = rowSums(.[2:7])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(methodsACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodsACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Spatial Extent
+
+Quick observations
+
+- Academic seem to be majority by absolute number for all extents
+- Business have largest proportion of Global and National studies, with smallest proprtion of Local studies
+- Private has larest proportion of Local and Mini studies (cost-related and given no RS and few GIS studies?)
+- Academic: decreasing proportion Local -> Regional -> National -> Global
+- Government: greater proportion of National than Regional
+
+```{r}
+
+spatialACounts <- affildata %>%
+  select(`Affiliation`,Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Asum = rowSums(.[2:9])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(spatialACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(spatialACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Temporal Extent
+
+Quick observations
+
+- Vast majority of all affiliations did not list temporal extent of the study
+Academic seem to be majority by absolute number for all methods
+- Not much more of interest here...
+
+```{r}
+
+temporalACounts <- affildata %>%
+  select(`Affiliation`,Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`) %>%
+  mutate(Asum = rowSums(.[2:10])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(temporalACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Concepts
+
+Quick observations
+
+- Academic seem to be majority by absolute number for all extents
+- Business have greatest proportions of climate change and ecosystem services, less interested in history and legacy
+- All other affiliations reasonably similar in terms of proportions
+
+```{r}
+
+conceptACounts <- affildata %>%
+  select(`Affiliation`,`PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`) %>%
+  mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(conceptACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Other Concepts
+
+Quick observations
+
+- Academic seem to be majority by absolute number for all extents
+- Government and NGOs have greater proportion of Management and Conservation than Academic
+- Private low on biodiversity but higher on cultural landscapes, landscape assessment and planning
+
+```{r}
+
+oconceptACounts <- affildata %>%
+  select(`Affiliation`,`Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`) %>%
+  mutate(Asum = rowSums(.[2:10])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(oconceptACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(oconceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+# Analysis by Landscape Type
+
+```{r}
+#spec(cpdata)
+
+lspdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = LspType, value = count, `Upland rural`:Other) %>%
+  filter(count > 0) %>%
+  group_by(`LspType`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+Quick observations:
+
+- Lowland rural dominate, followed by 'undefined' and Upland rural
+
+```{r}
+
+AlspCounts <- lspdata %>%
+  select(LspType,Academic, Government,NGO,Business,Private) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(AlspCounts, aes(x=LspType, y=count)) + geom_bar(stat="identity")
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- Academic are majority of all landscape types, with possible exception of Upland rural (Government?)
+- 
+
+```{r}
+ggplot(AlspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(AlspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Species
+Quick observations
+
+- Animal types quite evenly distributed across Lowland rural
+- Humans are large contributor to seascape studies (possibly by absolute number as well as relative)
+- Generic habitat is large contributor across all landscape types
+
+```{r}
+
+specieslspCounts <- lspdata %>%
+  select(LspType,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(specieslspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(specieslspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Methods
+
+Quick observations
+
+- 'Undefined landscape' studies are largely theoretical
+- Lowland rural largely studies using empirical and quantitative methods
+- Seascape studies have largest proportion of qualitative methods
+
+
+```{r}
+
+methodslspCounts <- lspdata %>%
+  select(LspType,Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Asum = rowSums(.[2:7])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(methodslspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodslspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Spatial Extent
+
+Quick observations
+
+- Urban landscape studies are dominated by Local scale analysis
+- Upland rural have larger proportion of national studies than Lowland rural
+
+```{r}
+
+spatiallspCounts <- lspdata %>%
+  select(LspType,Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Asum = rowSums(.[2:9])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -LspType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(spatiallspCounts, aes(x=LspType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(spatiallspCounts, aes(x=LspType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## More here
