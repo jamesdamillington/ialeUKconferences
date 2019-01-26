@@ -1,7 +1,7 @@
 ---
 title: "ialeUK 25 Years of Conferences"
 author: "James Millington"
-date: "20 January 2019"
+date: "26 January 2019"
 site: "bookdown::bookdown_site"
 output:
   bookdown::gitbook: default
@@ -11,6 +11,23 @@ link-citations: yes
 
 # Overview
 
-Insert preamble here. 
+Collection of analyses of conference abstracts at 25 years of ialeUK conferences 
 
 Use table of contents (e.g. in the panel on the left) to navigate the book. 
+
+*Suggestions for additional analysis*
+- For some themes, categories for 'undefined' abstracts have sometimes been removed from analysis; need to provide information on how removing these 'undefined' studies includences the number of abstracts in the analysis. 
+
+
+# Summary of Initial Quick Observations [add links later]
+
+## Abstracts though time
+
+- General increase through time to early 2000s then drop but steady through 2010s
+- NGO attendance has replaced declines in Government? (could check sum of Gov + NGO through time)
+- Empirical studies have decreased through time while GIS and qualitative have increased through time
+- Global studies only appear from 2014 onwards
+
+## Species
+
+- Plants have greatest proportions of longer studies (Decadal and Centuries) while Inverts have greatest proportion of shorter studies (Annual and Monthly) - makes sense given rates of change and life history of these organisms? 

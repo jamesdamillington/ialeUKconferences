@@ -1,0 +1,18 @@
+# Analysis by Methods
+
+Bar charts to examine how contributions to conferences vary by methods
+
+## Total Conference Contributions
+
+```{r}
+#spec(cpdata)
+
+metdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Method, value = count, Empirical:`Remote sensing`) %>%
+  filter(count > 0) %>%
+  group_by(`Method`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+

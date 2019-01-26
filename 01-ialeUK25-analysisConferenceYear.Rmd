@@ -92,7 +92,7 @@ ggplot(lspCounts, aes(x=`Conference Year`, y=prop, fill=Type)) + geom_bar(stat="
 
 ```
 
-## Species
+## Organism
 
 Quick observations:
 
@@ -185,7 +185,7 @@ Quick observations:
 
 - Ecosystem services appear from 1998 and have grown recently
 - climate change interactions have only become common recently (since 2008)
-- 'Scale and scaling' and 'connectivity and fragmentation seem to have decreased oin recent years
+- 'Scale and scaling' and 'connectivity and fragmentation seem to have decreased in recent years
 - LUCC and Spatial Analysis are mainstays throughout
 ```{r}
 conceptCounts <- yrdata %>%

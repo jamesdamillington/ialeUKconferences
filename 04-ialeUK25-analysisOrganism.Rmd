@@ -1,0 +1,213 @@
+# Analysis by Organism
+
+Bar charts to examine how contributions to conferences vary by organism
+
+## Total Conference Contributions
+
+```{r}
+#spec(cpdata)
+
+sppdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = SppType, value = count, Mammals:Fish) %>%
+  filter(count > 0) %>%
+  group_by(`SppType`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+Quick observations:
+
+- Amphibians, Fish, Reptiles are little studied
+
+```{r}
+
+AsppCounts <- sppdata %>%
+  select(SppType,Academic, Government,NGO,Business,Private) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(AsppCounts, aes(x=SppType, y=count)) + geom_bar(stat="identity")
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- Businesses and private individuals study humans (proportional)
+- By absolute numbers NGOs dominate study of birds 
+
+```{r}
+ggplot(AsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(AsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+- Human studies are most evenly distributed across landscape types
+- Unsurprisingly, fish are studies in riverscapes and seascapes
+- Birds, plants and inverts studies dominated by Lowland rural studies
+
+```{r}
+lspsppCounts <- sppdata %>%
+  select(SppType,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- Birds, Plants and Mammals studies predominantly in Lowland Rural lsps
+- Plants studies are grestest contribution (in total number) to Upland Rural lsps  
+
+```{r}
+
+lspsppCounts <- sppdata %>%
+  select(SppType,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
+
+ggplot(lspsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Methods
+
+Quick observations:
+
+- Humans dominated by qualitative studies, with few empirical (i.e. few interviews, questionnaires?)
+- Possibly surprisingly, plants do not have many RS studies
+
+```{r}
+methodssppCounts <- sppdata %>%
+  select(SppType, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(yrsum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(methodssppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodssppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Spatial Extent
+
+Quick observations:
+
+- Inverts dominated by mini studies
+- Fish have relatively high proportion of Global studies
+- Other species have reasonably evenly distributed proportions of scales
+```{r}
+extentsppCounts <- sppdata %>%
+  select(SppType, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(yrsum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(extentsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(extentsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Temporal Extent 
+
+### With undefined
+
+Quick observations:
+
+- Difficult to see much; examine without 'undefined' 
+```{r echo=F}
+temporalsppCounts <- sppdata %>%
+  select(SppType, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(yrsum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(temporalsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Without Undefined
+
+- Inverts dominated by annual (Yearly) studies, plus shorter studies
+- Plants have greatest proportions of longer studies (Decadal and Centuries) - makes sense given rates of change? 
+```{r echo=F}
+temporalsppCounts <- sppdata %>%
+  select(SppType, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(yrsum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(temporalsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Concepts
+
+Quick observations:
+
+- Humans have a relatively large proportion of Ecosystem Services studies (not surprising?)
+- Plants have largest number of LUCC studies
+```{r}
+conceptsppCounts <- sppdata %>%
+  select(SppType, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(yrsum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(conceptsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Other Concepts
+
+Quick observations:
+
+- Humans have largest proportion of Cultural Landscapes, Socio-Economic and Planning studies (unsurprising?)
+- Birds, Inverts and Mammals dominates by biodiveristy and Management and Conservation studies
+
+```{r}
+othCsppCounts <- sppdata %>%
+  select(SppType, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(yrsum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -SppType, -yrsum) %>%
+  mutate(prop = count / yrsum) 
+
+ggplot(othCsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(othCsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
