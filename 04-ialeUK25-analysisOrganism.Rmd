@@ -73,7 +73,7 @@ ggplot(lspsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identit
 Quick observations:
 
 - Birds, Plants and Mammals studies predominantly in Lowland Rural lsps
-- Plants studies are grestest contribution (in total number) to Upland Rural lsps  
+- Plants studies are greatest contribution (in total number) to Upland Rural lsps  
 
 ```{r}
 
