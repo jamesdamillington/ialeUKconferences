@@ -1,7 +1,7 @@
 ---
 title: "ialeUK 25 Years of Conferences"
 author: "James Millington"
-date: "26 January 2019"
+date: "31 January 2019"
 site: "bookdown::bookdown_site"
 output:
   bookdown::gitbook: default
@@ -9,32 +9,35 @@ documentclass: book
 link-citations: yes
 ---
 
-# Overview
+# Overview and Summary
 
-Collection of analyses of conference abstracts at 25 years of ialeUK conferences 
+This is a collection of analyses of conference abstracts from 25 years of ialeUK conferences. Analysis is ongoing.  
 
-Use table of contents (e.g. in the panel on the left) to navigate the book. 
+A summary of initial observations is shown below. 
+
+Use the table of contents (e.g. in the panel on the left) to navigate to detailed analysis (currently line and bar charts).  
 
 *Suggestions for additional analysis*
 - For some themes, categories for 'undefined' abstracts have sometimes been removed from analysis; need to provide information on how removing these 'undefined' studies includences the number of abstracts in the analysis. 
+- Other suggestions for quant analyses welcome
 
 
-# Summary of Initial Quick Observations [add links later]
+[add links below later to specific sections]
 
-## Abstracts though time
+## Summary: Abstracts though time
 
 - General increase through time to early 2000s then drop but steady through 2010s
 - NGO attendance has replaced declines in Government? (could check sum of Gov + NGO through time)
 - Empirical studies have decreased through time while GIS and qualitative have increased through time
 - Global studies only appear from 2014 onwards
 
-## Author affiliation
+## Summary: Author affiliation
 
 - Academic contributors dominate, followed by Government (but as shown above, Government contributions have decreased recently, replaced by NGOs)
 - Business contributors have noticeably lower proportion of empirical studies (expensive?) than other author types, substituted by GIS and qualitative
 - Government and NGOs have greater proportion of Management and Conservation than Academic
 
-## Landscape Type
+## Summary: Landscape Type
 
 - Lowland rural landscape studies dominate, followed by 'undefined' and Upland rural
 - Seascape studies have largest proportion of qualitative methods
@@ -44,7 +47,7 @@ Use table of contents (e.g. in the panel on the left) to navigate the book.
 - Little study of cultural landscapes in Urban areas
 
 
-## Organism
+## Summary: Organism
 
 - Amphibians, Fish, Reptiles are little studied
 - Plants have greatest proportions of longer studies (Decadal and Centuries) while Inverts have greatest proportion of shorter studies (Annual and Monthly) - makes sense given rates of change and life history of these organisms? 
