@@ -28,6 +28,29 @@ Use table of contents (e.g. in the panel on the left) to navigate the book.
 - Empirical studies have decreased through time while GIS and qualitative have increased through time
 - Global studies only appear from 2014 onwards
 
-## Species
+## Author affiliation
 
+- Academic contributors dominate, followed by Government (but as shown above, Government contributions have decreased recently, replaced by NGOs)
+- Business contributors have noticeably lower proportion of empirical studies (expensive?) than other author types, substituted by GIS and qualitative
+- Government and NGOs have greater proportion of Management and Conservation than Academic
+
+## Landscape Type
+
+- Lowland rural landscape studies dominate, followed by 'undefined' and Upland rural
+- Seascape studies have largest proportion of qualitative methods
+- Urban landscape studies are dominated by Local scale analysis
+- Upland rural have larger proportion of national studies than Lowland rural
+- Unsurprisingly, Green Infrastructure has greatest proportion in Urban landscapes and catchment-based approaches in Riverscapes
+- Little study of cultural landscapes in Urban areas
+
+
+## Organism
+
+- Amphibians, Fish, Reptiles are little studied
 - Plants have greatest proportions of longer studies (Decadal and Centuries) while Inverts have greatest proportion of shorter studies (Annual and Monthly) - makes sense given rates of change and life history of these organisms? 
+- Businesses and private individuals largely study humans (based on proportional data)
+- By absolute numbers NGOs dominate study of birds 
+- Humans dominated by qualitative studies, with few empirical (i.e. few interviews, questionnaires?)
+- Possibly surprisingly, plants do not have many RS studies
+- Inverts dominated by 'mini' spatial extent studies
+
