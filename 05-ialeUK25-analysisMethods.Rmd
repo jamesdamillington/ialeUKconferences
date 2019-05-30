@@ -2,8 +2,6 @@
 
 Bar charts to examine how contributions to conferences vary by methods
 
-## Total Conference Contributions
-
 ```{r}
 #spec(cpdata)
 
@@ -15,4 +13,204 @@ metdata <- cpdata %>%
   summarise_all(sum, na.rm=T) 
 ```
 
+## Total Conference Contributions
+
+Quick observations:
+
+- Empirical and Quantitative studies dominate
+- little remote sensing
+
+```{r}
+
+AmetCounts <- metdata %>%
+  select(Method,Academic, Government,NGO,Business,Private) %>%
+  mutate(Msum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum)  #calculate proportion
+
+ggplot(AmetCounts, aes(x=Method, y=count)) + geom_bar(stat="identity")
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- pretty consistent distribution of methods across affiliations
+
+```{r}
+ggplot(AmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(AmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+- Qualitative studies are most evenly distributed across landscape types
+- Theoretical studies most commonly do not define a landscape type
+
+```{r}
+lspmetCounts <- metdata %>%
+  select(Method,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Msum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum)  #calculate proportion
+
+ggplot(lspmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- This is generally less informative than with 'un-defined' (in contrast to other classifications)
+- Does highlight that qualitative studies are most prevalent in seascape studies
+
+```{r}
+
+lspmetCounts <- metdata %>%
+  select(Method,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Msum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum)  #calculate proportion
+
+ggplot(lspmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Species
+
+Quick observations
+
+- Qualitative studies most commonly study humans
+
+```{r}
+
+speciesmetCounts <- metdata %>%
+  select(Method,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Msum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum)  #calculate proportion
+
+ggplot(speciesmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(speciesmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Spatial Extent
+
+Quick observations:
+
+- Theoretical studies have largely undefined extent
+- No micro qualitative studies
+- very few global empirical studies, and no GIS global studies
+```{r}
+extentmetCounts <- metdata %>%
+  select(Method, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Msum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum) 
+
+ggplot(extentmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(extentmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Temporal Extent 
+
+### With undefined
+
+Quick observations:
+
+- Difficult to see much; examine without 'undefined' 
+```{r echo=F}
+temporalmetCounts <- metdata %>%
+  select(Method, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(Msum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum) 
+
+ggplot(temporalmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Without Undefined
+
+- Theoretical studies are years or longer 
+- Actually, vast majority of studies are months or longer (should see this when splitting by temporal extent)
+
+```{r echo=F}
+temporalmetCounts <- metdata %>%
+  select(Method, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(Msum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum) 
+
+ggplot(temporalmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Concepts
+
+Quick observations:
+
+- Surprisingly few theoretical studies of scale and scaling?
+- Relatively large number of qualitative studies are about landscape sustainability
+- Relatively few empirical studies of ecosystem services
+- GIS studies have largest proportion of spatial analysis and modellng (unsurprisingly)
+
+```{r}
+conceptmetCounts <- metdata %>%
+  select(Method, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(Msum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum) 
+
+ggplot(conceptmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Other Concepts
+
+Quick observations:
+
+- Qualitative studies have relatively low proportion of biodiversity studies, but have relatively large proportion of socio-economic and cultural
+- Theoretical studies have similar distribution to qualitative slightly more biodiversity at expense of cultural
+
+```{r}
+othCmetCounts <- metdata %>%
+  select(Method, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(Msum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Method, -Msum) %>%
+  mutate(prop = count / Msum) 
+
+ggplot(othCmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(othCmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
 
