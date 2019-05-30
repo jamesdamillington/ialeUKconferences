@@ -1,7 +1,7 @@
 ---
 title: "ialeUK 25 Years of Conferences"
 author: "James Millington"
-date: "31 January 2019"
+date: "30 May 2019"
 site: "bookdown::bookdown_site"
 output:
   bookdown::gitbook: default
@@ -57,3 +57,28 @@ Use the table of contents (e.g. in the panel on the left) to navigate to detaile
 - Possibly surprisingly, plants do not have many RS studies
 - Inverts dominated by 'mini' spatial extent studies
 
+## Summary: Methods
+
+- Empirical and Quantitative studies dominate with relatively little remote sensing
+- Quantitative studies used relatively consistently across all landscape types
+- Qualitative studies most commonly study humans (socio-economic dimensions and cultural landscapes)
+- Theoretical studies have largely undefined extent and most commonly in not defining a landscape type
+- Surprisingly few theoretical studies of scale and scaling?
+- Relatively few empirical studies of ecosystem services
+
+## Summary: Spatial Extent
+
+- Dominated by Local extent studies, but also many at national and regional extents
+- Global and Continental (largest extent) have fewest studies (8 and 27 respectively)
+- Global extent studies are qualitatively different to other extent for several factors:
+  + Global extent studies do not consider Lowland rural landscapes
+  + Global extent studies do not consider amphibiams, birds, reptiles, or woodlands but have the largest proportions of Fish and generic Habitat studies
+  + Global extent studies consider only Decades and Years timescales
+- Smallest extents (micro and mini) have smallest proportions of Socio-Economic Dimensions studies but largest proportions of Biodiversity studies
+- Consistent proportions of Management and Conservation studies across all extents
+- Global, Continental and Undefined Extent have the greatest proportions of Theoretical,  Qualitative and Remote Sensing studies, whereas the smallest extents (mini and micro) have the largest proportions of Empirical studies (and Local have largest absolute number)
+
+## Summary: Temporal Duration
+
+- Majority of studies do not define or report their temporal duration (65%) (so not much point examining further?)
+- Those that do generally have durations longer than Years (~89%) 

@@ -1,0 +1,227 @@
+# Analysis by Temporal Duration
+
+Bar charts to examine how contributions to conferences vary by methods
+
+```{r}
+#spec(cpdata)
+
+tempdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Temporal, value = count, Hours:`Undefined Temporal`) %>%
+  filter(count > 0) %>%
+  group_by(`Temporal`) %>%
+  summarise_all(sum, na.rm=T)
+
+utempdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Temporal, value = count, Hours:Longer) %>%
+  filter(count > 0) %>%
+  group_by(`Temporal`) %>%
+  summarise_all(sum, na.rm=T) 
+
+```
+
+## Total Conference Contributions
+
+Quick observations:
+
+- Majority of studies do not define or report their temporal duration (65%)
+- Those that do generally have durations longer than Years (~89%) 
+
+```{r}
+
+print(tempdata %>%
+    select(Temporal, count) %>%
+    mutate(prop = count/sum(count)) %>%
+    mutate(prop = round(prop,3)))
+    
+
+ggplot(tempdata, aes(x=Temporal, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Temporal, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5)) +
+  ggtitle("All Data")
+
+
+print(utempdata %>%
+    select(Temporal, count) %>%
+    mutate(prop = count/sum(count)) %>%
+    mutate(prop = round(prop,3)))
+    
+
+ggplot(utempdata, aes(x=Temporal, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Temporal, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5)) +
+  ggtitle("Excluding Undefined")
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+
+```{r}
+
+authCounts <- tempdata %>%
+  select(Temporal,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum) #calculate proportion 
+
+authCountsW <- tempdata %>%
+  select(Temporal,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%
+  mutate_if(is.numeric, funs(prop = . / sum)) %>%
+  mutate_at(8:12, round, 3)
+
+print(authCountsW)
+
+ggplot(authCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+
+
+
+```{r}
+lspCounts <- tempdata %>%
+  select(Temporal,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(lspCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+
+```{r}
+
+lspCounts <- tempdata %>%
+  select(Temporal,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(lspCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Species
+
+Quick observations
+
+
+```{r}
+
+speciesCounts <- tempdata %>%
+  select(Temporal, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(sum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(speciesCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(speciesCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Methods
+
+Quick observations:
+
+
+```{r}
+methodsCounts <- tempdata %>%
+  select(Temporal, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(sum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(methodsCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodsCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+
+## Spatial Extent
+
+Quick observations:
+
+
+
+```{r}
+extentCounts <- tempdata %>%
+  select(Temporal, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(extentCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(extentCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+
+## Concepts
+
+Quick observations:
+
+
+
+```{r}
+conceptCounts <- tempdata %>%
+  select(Temporal, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(sum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(conceptCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Other Concepts
+
+Quick observations:
+
+
+
+```{r}
+otherCounts <- tempdata %>%
+  select(Temporal, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Temporal, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(otherCounts, aes(x=Temporal, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(otherCounts, aes(x=Temporal, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+

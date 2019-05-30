@@ -1,0 +1,253 @@
+# Analysis by Spatial Extent
+
+Bar charts to examine how contributions to conferences vary by methods
+
+```{r}
+#spec(cpdata)
+
+spatdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Spatial, value = count, Micro:`Undefined Extent`) %>%
+  filter(count > 0) %>%
+  group_by(`Spatial`) %>%
+  summarise_all(sum, na.rm=T) 
+
+uspatdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Spatial, value = count, Micro:Regional) %>%
+  filter(count > 0) %>%
+  group_by(`Spatial`) %>%
+  summarise_all(sum, na.rm=T) 
+```
+
+## Total Conference Contributions
+
+Quick observations:
+
+- Dominated by Local extent studies, but also many at national and regional extents
+- Global and Continental (largest extent) have fewest studies (8 and 27 respectively)
+
+```{r}
+
+#ggplot(authCounts, aes(x=Spatial, y=count)) + geom_bar(stat="identity")
+
+print(spatdata %>%
+    select(Spatial, count) %>%
+    mutate(prop = count/sum(count)) %>%
+    mutate(prop = round(prop,3)))
+    
+
+ggplot(spatdata, aes(x=Spatial, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Spatial, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5))
+
+
+print(uspatdata %>%
+    select(Spatial, count) %>%
+    mutate(prop = count/sum(count)) %>%
+    mutate(prop = round(prop,3)))
+    
+
+ggplot(uspatdata, aes(x=Spatial, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Spatial, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5))
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- global studies are have greater proportions of Business and NGO authorship
+- all extents dominated by academic authors, except Global and National 
+- All authorships represented at all extents except Private (in Micro and Global) and Government (in Global)
+
+```{r}
+authCounts <- spatdata %>%
+  select(Spatial,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(authCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+- Global extent studies do not consider Lowland rural landscapes
+
+
+```{r}
+lspCounts <- spatdata %>%
+  select(Spatial,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(lspCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- National extent studies have largest proportion of Upland Rural landscape studies
+- Micro, Mini and Regional extent studies dominated by Lowland rural
+- 'Undefined extent' has largest proportion of riverscape studies
+
+```{r}
+
+lspCounts <- spatdata %>%
+  select(Spatial,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(lspCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Species
+
+Quick observations
+
+- Global studies are again qualitatively different from other scale studies - no amphibiams, birds, reptiles, woodland studies but largest proportions of Fish and generic Habitat studies
+- Smallest extents (mini and micro) have largest proportions of Plant and Inverts studies
+
+```{r}
+
+speciesCounts <- spatdata %>%
+  select(Spatial, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(sum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(speciesCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(speciesCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Methods
+
+Quick observations:
+
+- Global, Continental and Undefined Extent have the greatest proportions of Theoretical,  Qualitative and Remote Sensing studies
+- Smallest extents (mini and micro) have the largest proportions of Empirical studies (and local have largest absolute number)
+- Regional and Local studies have largest number and proportions of GIS studies (and GIS used least at extremes of extents, i.e. mini, micro and global)
+
+```{r}
+methodsCounts <- spatdata %>%
+  select(Spatial, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(sum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(methodsCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(methodsCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+
+## Temporal Extent 
+
+### With undefined
+
+Quick observations:
+
+
+```{r echo=F}
+temporalCounts <- spatdata %>%
+  select(Spatial, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(temporalCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+### Without Undefined
+
+- Again Global is qualitatively different (only Decades and Years studies)
+- Continental has nothing shorter than Years
+- National and Regional extents have large proportions of Decadal studies
+- Micro and Mini extents have largest proprtions of Monthly and Weekly studies
+
+```{r echo=F}
+temporalCounts <- spatdata %>%
+  select(Spatial, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(temporalCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(temporalCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+## Concepts
+
+Quick observations:
+
+- Global extents have largest proportions of Ecosystem Services and Climate Change studies
+- Continental and National extents have largest proportions of LUCC studies
+- Micro extent have largest proportion of Pattern-Process-Scale studies
+
+```{r}
+conceptCounts <- spatdata %>%
+  select(Spatial, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(sum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(conceptCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(conceptCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
+
+## Other Concepts
+
+Quick observations:
+
+- Smallest extents (micro and mini) have smallest proportions of Socio-Economic Dimensions studies and largest proportions of Biodiversity studies
+- Consistent proportions of Management and Conservation studies across all extents
+
+
+```{r}
+otherCounts <- spatdata %>%
+  select(Spatial, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Spatial, -sum) %>%
+  mutate(prop = count / sum) 
+
+ggplot(otherCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(otherCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+```
+
