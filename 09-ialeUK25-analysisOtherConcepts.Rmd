@@ -1,0 +1,355 @@
+# Analysis by Other Concepts
+
+Bar charts to examine how contributions to conferences vary by methods
+
+```{r}
+#spec(cpdata)
+
+othdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = OtherC, value = count, `Green Infrastructure`:`Invasives Pests Diseases`) %>%
+  filter(count > 0) %>%
+  group_by(`OtherC`) %>%
+  summarise_all(sum, na.rm=T) 
+
+```
+
+## Total Conference Contributions
+
+Quick observations:
+
+- invasive pests have smallest number of studies (and therefore treat qualitative differences in proportions below with caution)
+- Management & Conservation and Biodiversity studies componse the majority of studies (56%)
+
+```{r}
+othdata %>%
+  select(OtherC, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+    
+
+ggplot(othdata, aes(x=OtherC, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=OtherC, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.25)) + 
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- no obvious differences (thother than invasive pests which has small numbers)
+
+```{r}
+authCounts <- othdata %>%
+  select(OtherC,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+othdata %>%
+  select(OtherC,Academic, Government,NGO,Business,Private) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(authCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(authCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+- Green infrastructure has by far greatest proportion of Urban landscape studies (makes sense)
+- Catchment approaches have greatest proportion of Riverscapes (makes sense)
+
+```{r}
+lspCounts <- othdata %>%
+  select(OtherC,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+othdata %>%
+  select(OtherC,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Total = rowSums(.[2:8])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(lspCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(lspCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- as above
+
+```{r}
+
+lspCounts <- othdata %>%
+  select(OtherC,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+othdata %>%
+  select(OtherC,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(lspCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(lspCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Species
+
+Quick observations
+
+- Management & Conservation studies have relatively low propotion of human studies; greatest proportion of Woodland studies
+- Biodiversity studies have relatively large proportion of Inverts (along with invasives)
+
+```{r}
+
+speciesCounts <- othdata %>%
+  select(OtherC, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(sum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+othdata %>%
+  select(OtherC, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Total = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(speciesCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(speciesCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Methods
+
+Quick observations:
+
+- Other than invasives, Biodiversity and Management & Conservation have greatest proportions of Empirical and lowest proportions of Theoretical
+
+
+```{r}
+methodsCounts <- othdata %>%
+  select(OtherC, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(sum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum) 
+
+othdata %>%
+  select(OtherC, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Total = rowSums(.[2:7])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(methodsCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(methodsCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Spatial Extent
+
+Quick observations:
+
+
+
+```{r}
+spatialCounts <- othdata %>%
+  select(OtherC, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum) 
+
+othdata %>%
+  select(OtherC, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Total = rowSums(.[2:9])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(spatialCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(spatialCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Temporal Extent 
+
+### With undefined
+
+Quick observations:
+
+- no obvious patterns
+
+```{r echo=F}
+temporalCounts <- othdata %>%
+  select(OtherC, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum) 
+
+othdata %>%
+  select(OtherC, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(Total = rowSums(.[2:10])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(temporalCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(temporalCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Without Undefined
+
+- no obvious patterns
+
+```{r echo=F}
+temporalCounts <- othdata %>%
+  select(OtherC, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum) 
+
+othdata %>%
+  select(OtherC, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(Total = rowSums(.[2:9])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(temporalCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(temporalCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Concepts
+
+Quick observations:
+
+- Biodiversity and Management & Conservation have similar proportions; both with relatively large proportions of connectivity and fragmentation
+
+```{r}
+conceptCounts <- othdata %>%
+  select(OtherC, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(sum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -OtherC, -sum) %>%
+  mutate(prop = count / sum) 
+
+
+othdata %>%
+  select(OtherC, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(Total = rowSums(.[2:11])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(conceptCounts, aes(x=OtherC, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(conceptCounts, aes(x=OtherC, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+

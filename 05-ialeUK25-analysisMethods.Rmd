@@ -22,13 +22,19 @@ Quick observations:
 
 ```{r}
 
-AmetCounts <- metdata %>%
-  select(Method,Academic, Government,NGO,Business,Private) %>%
-  mutate(Msum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum)  #calculate proportion
+metdata %>%
+  select(Method, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+    
 
-ggplot(AmetCounts, aes(x=Method, y=count)) + geom_bar(stat="identity")
+ggplot(metdata, aes(x=Method, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Method, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.25))
+
 
 ```
 
@@ -39,9 +45,16 @@ Quick observations:
 - pretty consistent distribution of methods across affiliations
 
 ```{r}
-ggplot(AmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+authorCounts <- metdata %>%
+  select(Method,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(AmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authorCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authorCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -55,15 +68,15 @@ Quick observations:
 - Theoretical studies most commonly do not define a landscape type
 
 ```{r}
-lspmetCounts <- metdata %>%
+lspCounts <- metdata %>%
   select(Method,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
-  mutate(Msum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum)  #calculate proportion
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(lspmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(lspmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
 ### Without 'Undefined LspType' and 'Other' landscape types
@@ -75,15 +88,15 @@ Quick observations:
 
 ```{r}
 
-lspmetCounts <- metdata %>%
+lspCounts <- metdata %>%
   select(Method,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
-  mutate(Msum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum)  #calculate proportion
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(lspmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(lspmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -95,15 +108,15 @@ Quick observations
 
 ```{r}
 
-speciesmetCounts <- metdata %>%
+sppCounts <- metdata %>%
   select(Method,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
-  mutate(Msum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum)  #calculate proportion
+  mutate(sum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(speciesmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(sppCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(speciesmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(sppCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -116,15 +129,15 @@ Quick observations:
 - No micro qualitative studies
 - very few global empirical studies, and no GIS global studies
 ```{r}
-extentmetCounts <- metdata %>%
+spatialCounts <- metdata %>%
   select(Method, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
-  mutate(Msum = rowSums(.[2:9])) %>%
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum) 
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(extentmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(extentmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -136,16 +149,16 @@ Quick observations:
 
 - Difficult to see much; examine without 'undefined' 
 ```{r echo=F}
-temporalmetCounts <- metdata %>%
+temporalCounts <- metdata %>%
   select(Method, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
 ) %>%
-  mutate(Msum = rowSums(.[2:10])) %>%
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum) 
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(temporalmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(temporalmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -155,16 +168,16 @@ ggplot(temporalmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="ide
 - Actually, vast majority of studies are months or longer (should see this when splitting by temporal extent)
 
 ```{r echo=F}
-temporalmetCounts <- metdata %>%
+temporalCounts <- metdata %>%
   select(Method, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
 ) %>%
-  mutate(Msum = rowSums(.[2:9])) %>%
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum) 
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(temporalmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(temporalmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -178,17 +191,17 @@ Quick observations:
 - GIS studies have largest proportion of spatial analysis and modellng (unsurprisingly)
 
 ```{r}
-conceptmetCounts <- metdata %>%
+conceptCounts <- metdata %>%
   select(Method, `PPS of landscapes`,
 `Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
 ) %>%
-  mutate(Msum = rowSums(.[2:11])) %>%
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum) 
+  mutate(sum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(conceptmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(conceptmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -201,16 +214,16 @@ Quick observations:
 - Theoretical studies have similar distribution to qualitative slightly more biodiversity at expense of cultural
 
 ```{r}
-othCmetCounts <- metdata %>%
+othCCounts <- metdata %>%
   select(Method, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
 ) %>%
-  mutate(Msum = rowSums(.[2:10])) %>%
-  gather(key = Type, value = count, -Method, -Msum) %>%
-  mutate(prop = count / Msum) 
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Method, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(othCmetCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(othCCounts, aes(x=Method, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(othCmetCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(othCCounts, aes(x=Method, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 

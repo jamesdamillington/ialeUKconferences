@@ -21,13 +21,16 @@ Quick observations:
 
 ```{r}
 
-lspACounts <- affildata %>%
-  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
-  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
-  mutate(prop = count / Asum)  #calculate proportion
+print(affildata %>%
+    select(Affiliation, count) %>%
+    mutate(prop = count/sum(count)) %>%
+    mutate(prop = round(prop,3)))
+    
 
-ggplot(lspACounts, aes(x=`Affiliation`, y=count)) + geom_bar(stat="identity")
+ggplot(affildata, aes(x=Affiliation, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Affiliation, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5))
+
 
 ```
 
@@ -43,10 +46,21 @@ Quick observations:
 - Private have greatest proportions of Seascape and Other
 
 ```{r}
+lspCounts <- affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
+  mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+print(affildata %>%
+  select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ sum))
+)
 
-ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(lspCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
 ### Without 'Undefined LspType' and 'Other' landscape types
@@ -59,15 +73,15 @@ Quick observations:
 
 ```{r}
 
-lspACounts <- affildata %>%
+lspCounts <- affildata %>%
   select(`Affiliation`,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
   mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(lspACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(lspACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -83,15 +97,15 @@ Quick observations
 
 ```{r}
 
-speciesACounts <- affildata %>%
+speciesCounts <- affildata %>%
   select(`Affiliation`,Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
   mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(speciesACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(speciesCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(speciesACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(speciesCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -108,15 +122,15 @@ Quick observations
 
 ```{r}
 
-methodsACounts <- affildata %>%
+methodsCounts <- affildata %>%
   select(`Affiliation`,Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
   mutate(Asum = rowSums(.[2:7])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(methodsACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(methodsCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(methodsACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(methodsCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -132,15 +146,15 @@ Quick observations
 
 ```{r}
 
-spatialACounts <- affildata %>%
+spatialCounts <- affildata %>%
   select(`Affiliation`,Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
   mutate(Asum = rowSums(.[2:9])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(spatialACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(spatialACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -154,15 +168,15 @@ Academic seem to be majority by absolute number for all methods
 
 ```{r}
 
-temporalACounts <- affildata %>%
+temporalCounts <- affildata %>%
   select(`Affiliation`,Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`) %>%
   mutate(Asum = rowSums(.[2:10])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(temporalACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(temporalACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -176,16 +190,16 @@ Quick observations
 
 ```{r}
 
-conceptACounts <- affildata %>%
+conceptCounts <- affildata %>%
   select(`Affiliation`,`PPS of landscapes`,
 `Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`) %>%
   mutate(Asum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(conceptACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(conceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -199,15 +213,15 @@ Quick observations
 
 ```{r}
 
-oconceptACounts <- affildata %>%
+otherCounts <- affildata %>%
   select(`Affiliation`,`Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`) %>%
   mutate(Asum = rowSums(.[2:10])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Affiliation`, -Asum) %>%
   mutate(prop = count / Asum)  #calculate proportion
 
-ggplot(oconceptACounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(otherCounts, aes(x=`Affiliation`, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(oconceptACounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(otherCounts, aes(x=`Affiliation`, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 

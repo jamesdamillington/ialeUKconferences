@@ -71,9 +71,9 @@ Use the table of contents (e.g. in the panel on the left) to navigate to detaile
 - Dominated by Local extent studies, but also many at national and regional extents
 - Global and Continental (largest extent) have fewest studies (8 and 27 respectively)
 - Global extent studies are qualitatively different to other extent for several factors:
-  + Global extent studies do not consider Lowland rural landscapes
-  + Global extent studies do not consider amphibiams, birds, reptiles, or woodlands but have the largest proportions of Fish and generic Habitat studies
-  + Global extent studies consider only Decades and Years timescales
+    + Global extent studies do not consider Lowland rural landscapes
+    + Global extent studies do not consider amphibiams, birds, reptiles, or woodlands but have the largest proportions of Fish and generic Habitat studies
+    + Global extent studies consider only Decades and Years timescales
 - Smallest extents (micro and mini) have smallest proportions of Socio-Economic Dimensions studies but largest proportions of Biodiversity studies
 - Consistent proportions of Management and Conservation studies across all extents
 - Global, Continental and Undefined Extent have the greatest proportions of Theoretical,  Qualitative and Remote Sensing studies, whereas the smallest extents (mini and micro) have the largest proportions of Empirical studies (and Local have largest absolute number)
@@ -82,3 +82,19 @@ Use the table of contents (e.g. in the panel on the left) to navigate to detaile
 
 - Majority of studies do not define or report their temporal duration (65%) (so not much point examining further?)
 - Those that do generally have durations longer than Years (~89%) 
+
+## Summary: Concepts
+
+- Connectivity & fragmentation, LUCC and spatial analysis & modelling most frequent (composing > 50%) 
+- Ecosystem services have greatest proportion of urban landscapes and lowest in lowland rural
+- Connectivity & Fragmentation have greatest proportion of studies in Lowland rural landscapes and largest proportion of local studies
+- Ecosystem services has smallest proportion of Empirical studies, largest proportion of global studies and fewest mini and micro studies
+
+## Summary: Other Concepts
+
+- Management & Conservation and Biodiversity studies componse the majority of studies (56%)
+- Invasive pests have smallest number of studies (and therefore qualitative differences in proportions shown should be treated with caution)
+- Management & Conservation studies have relatively low propotion of human studies; greatest proportion of Woodland studies
+- Biodiversity studies have relatively large proportion of Inverts (along with invasives)
+- Other than invasives, Biodiversity and Management & Conservation have greatest proportions of Empirical and lowest proportions of Theoretical
+- Biodiversity and Management & Conservation have similar proportions; both with relatively large proportions of connectivity and fragmentation

@@ -14,7 +14,7 @@ spatdata <- cpdata %>%
 
 uspatdata <- cpdata %>%
   select_if(is.numeric) %>%
-  gather(key = Spatial, value = count, Micro:Regional) %>%
+  gather(key = Spatial, value = count, Micro:Global) %>%
   filter(count > 0) %>%
   group_by(`Spatial`) %>%
   summarise_all(sum, na.rm=T) 
@@ -31,10 +31,13 @@ Quick observations:
 
 #ggplot(authCounts, aes(x=Spatial, y=count)) + geom_bar(stat="identity")
 
-print(spatdata %>%
-    select(Spatial, count) %>%
-    mutate(prop = count/sum(count)) %>%
-    mutate(prop = round(prop,3)))
+spatdata %>%
+  select(Spatial, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
     
 
 ggplot(spatdata, aes(x=Spatial, y=count)) + 
@@ -42,10 +45,13 @@ ggplot(spatdata, aes(x=Spatial, y=count)) +
   geom_text(aes(x=Spatial, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.5))
 
 
-print(uspatdata %>%
-    select(Spatial, count) %>%
-    mutate(prop = count/sum(count)) %>%
-    mutate(prop = round(prop,3)))
+uspatdata %>%
+  select(Spatial, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
     
 
 ggplot(uspatdata, aes(x=Spatial, y=count)) + 
@@ -69,6 +75,16 @@ authCounts <- spatdata %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum)  #calculate proportion
 
+spatdata %>%
+  select(Spatial,Academic, Government,NGO,Business,Private) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
 ggplot(authCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(authCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
@@ -91,6 +107,16 @@ lspCounts <- spatdata %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum)  #calculate proportion
 
+spatdata %>%
+  select(Spatial,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Total = rowSums(.[2:8])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
 ggplot(lspCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(lspCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
@@ -111,6 +137,16 @@ lspCounts <- spatdata %>%
   mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum)  #calculate proportion
+
+spatdata %>%
+  select(Spatial,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
 
 ggplot(lspCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
@@ -133,6 +169,16 @@ speciesCounts <- spatdata %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum)  #calculate proportion
 
+spatdata %>%
+  select(Spatial, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Total = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
 ggplot(speciesCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(speciesCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
@@ -154,6 +200,16 @@ methodsCounts <- spatdata %>%
   mutate(sum = rowSums(.[2:7])) %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum) 
+
+spatdata %>%
+  select(Spatial, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Total = rowSums(.[2:7])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
 
 ggplot(methodsCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
@@ -178,6 +234,17 @@ temporalCounts <- spatdata %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum) 
 
+spatdata %>%
+  select(Spatial, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(Total = rowSums(.[2:10])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
 ggplot(temporalCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(temporalCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
@@ -198,6 +265,17 @@ temporalCounts <- spatdata %>%
   mutate(sum = rowSums(.[2:9])) %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum) 
+
+spatdata %>%
+  select(Spatial, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(Total = rowSums(.[2:9])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
 
 ggplot(temporalCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
@@ -222,6 +300,19 @@ conceptCounts <- spatdata %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum) 
 
+
+spatdata %>%
+  select(Spatial, `PPS of landscapes`,
+`Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
+) %>%
+  mutate(Total = rowSums(.[2:11])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
 ggplot(conceptCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ggplot(conceptCounts, aes(x=Spatial, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
@@ -244,6 +335,17 @@ otherCounts <- spatdata %>%
   mutate(sum = rowSums(.[2:10])) %>%
   gather(key = Type, value = count, -Spatial, -sum) %>%
   mutate(prop = count / sum) 
+
+spatdata %>%
+  select(Spatial, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(Total = rowSums(.[2:10])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
 
 ggplot(otherCounts, aes(x=Spatial, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 

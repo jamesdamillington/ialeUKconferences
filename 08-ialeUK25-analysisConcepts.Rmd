@@ -1,0 +1,360 @@
+# Analysis by Concept
+
+Bar charts to examine how contributions to conferences vary by methods
+
+```{r}
+#spec(cpdata)
+
+conceptdata <- cpdata %>%
+  select_if(is.numeric) %>%
+  gather(key = Concept, value = count, `PPS of landscapes`:`Accuracy and uncertainty`) %>%
+  filter(count > 0) %>%
+  group_by(`Concept`) %>%
+  summarise_all(sum, na.rm=T) 
+
+```
+
+## Total Conference Contributions
+
+Quick observations:
+
+- Connectivity & fragmentation, LUCC and spatial analysis & modelling most frequent (composing > 50%) 
+
+```{r}
+
+#ggplot(authCounts, aes(x=Concept, y=count)) + geom_bar(stat="identity")
+
+conceptdata %>%
+  select(Concept, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+    
+
+ggplot(conceptdata, aes(x=Concept, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=Concept, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.25)) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+## Author Affiliation
+
+Quick observations:
+
+- no obvious differences between concepts
+
+```{r}
+authCounts <- conceptdata %>%
+  select(Concept,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+conceptdata %>%
+  select(Concept,Academic, Government,NGO,Business,Private) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(authCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(authCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Landscape Type 
+
+### Using all landscape types
+
+Quick observations: 
+
+- Ecosystem services have greatest proportion of urban landscapes and lowest in lowland rural
+- Connectivity & Fragmentation have greatest proportion of studies in Lowland rural landscapes
+
+```{r}
+lspCounts <- conceptdata %>%
+  select(Concept,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+conceptdata %>%
+  select(Concept,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
+  mutate(Total = rowSums(.[2:8])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(lspCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(lspCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Without 'Undefined LspType' and 'Other' landscape types
+
+Quick observations:
+
+- patterns seen above more obvious
+
+```{r}
+
+lspCounts <- conceptdata %>%
+  select(Concept,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+conceptdata %>%
+  select(Concept,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
+  mutate(Total = rowSums(.[2:6])) %>%   #calculate total
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(lspCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(lspCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Species
+
+Quick observations
+
+- Ecosystem services have greatest proportion of humans (31%)
+
+
+```{r}
+
+speciesCounts <- conceptdata %>%
+  select(Concept, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(sum = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+conceptdata %>%
+  select(Concept, Mammals, Humans, Birds, Reptiles, Inverts, Plants, Amphibians, Fish, `Generic Habitat`,`Woodland Forests`) %>%
+  mutate(Total = rowSums(.[2:11])) %>%   #calculate total for subsquent calcultation of proportion
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(speciesCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(speciesCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Methods
+
+Quick observations:
+
+- Ecosystem services has smallest proportion of Empirical studies
+
+```{r}
+methodsCounts <- conceptdata %>%
+  select(Concept, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(sum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum) 
+
+conceptdata %>%
+  select(Concept, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
+  mutate(Total = rowSums(.[2:7])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(methodsCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(methodsCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+## Spatial Extent
+
+Quick observations:
+
+- Ecosystem services has the largest proportion of global studies and fewest mini and micro studies
+- Connectivity & Fragmentation has largest proportion of local studies
+
+```{r}
+spatialCounts <- conceptdata %>%
+  select(Concept, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum) 
+
+conceptdata %>%
+  select(Concept, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
+  mutate(Total = rowSums(.[2:9])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(spatialCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(spatialCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+## Temporal Extent 
+
+### With undefined
+
+Quick observations:
+
+
+```{r echo=F}
+temporalCounts <- conceptdata %>%
+  select(Concept, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum) 
+
+conceptdata %>%
+  select(Concept, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
+) %>%
+  mutate(Total = rowSums(.[2:10])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(temporalCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(temporalCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Without Undefined
+
+- History and Legacy studies have greatest proportion of Centries and Longer studies
+
+
+```{r echo=F}
+temporalCounts <- conceptdata %>%
+  select(Concept, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum) 
+
+conceptdata %>%
+  select(Concept, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
+) %>%
+  mutate(Total = rowSums(.[2:9])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(temporalCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(temporalCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+## Other Concepts
+
+Quick observations:
+
+- Connectivity & Fragmentation and pattern-process-scale have greatest proportion of biodiversity studies
+- History and Legacy have greatest proportion of cultural studies
+
+```{r}
+otherCounts <- conceptdata %>%
+  select(Concept, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -Concept, -sum) %>%
+  mutate(prop = count / sum) 
+
+conceptdata %>%
+  select(Concept, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
+) %>%
+  mutate(Total = rowSums(.[2:10])) %>%
+  mutate_if(is.numeric, funs(prop = ./ Total)) %>%
+  mutate_at(vars(ends_with("prop")), round, 3) %>% 
+  select(-Total_prop) %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(otherCounts, aes(x=Concept, y=count, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(otherCounts, aes(x=Concept, y=prop, fill=Type)) + 
+  geom_bar(stat="identity", colour="white") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+

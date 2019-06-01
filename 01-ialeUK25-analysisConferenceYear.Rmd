@@ -9,6 +9,7 @@ Bar and line charts to examine how contribution to conferences have changed over
 rm(list=ls())
 library(tidyverse)
 library(ggplot2)
+library(kableExtra)
 path <- "C:/Users/k1076631/Google Drive/Research/Papers/InProgress/ialeUK_25years/QuantAnalysis/Rproject"
 setwd(path)
 filename <- "abstract_review_export_2018-06-11.csv"
@@ -23,6 +24,8 @@ yrdata <- cpdata %>%
   select_if(is.numeric) %>%
   group_by(`Conference Year`) %>%
   summarise_all(sum, na.rm=T) 
+  
+#use DT to present the entire data table on HTML? See https://rstudio.github.io/DT/
 
 ```
 
@@ -33,13 +36,23 @@ Quick observations:
 
 - general increase through time to early 2000s then drop but steady through 2010s
 ```{r}
-authorCounts <- yrdata %>%
+summary <- cpdata %>%
+  select_if(is.numeric) %>%
+  group_by(`Conference Year`) %>%
+  summarise_all(sum, na.rm=T) %>%
   select(`Conference Year`,Academic, Government,NGO,Business,Private) %>%
-  mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
-  mutate(prop = count / yrsum)  #calculate proportion
+  mutate(count = rowSums(.[2:6])) %>%   
+  select(`Conference Year`, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) 
 
-ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_bar(stat="identity")
+summary %>%
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+
+ggplot(summary, aes(x=`Conference Year`, y=count)) + 
+  geom_bar(stat="identity") 
 
 ```
 
@@ -58,7 +71,6 @@ authorCounts <- yrdata %>%
   mutate(yrsum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
   gather(key = Type, value = count, -`Conference Year`, -yrsum) %>%
   mutate(prop = count / yrsum)  #calculate proportion
-
 
 ggplot(authorCounts, aes(x=`Conference Year`, y=count)) + geom_line(aes(colour=Type))
 

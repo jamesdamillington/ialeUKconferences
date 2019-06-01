@@ -21,13 +21,18 @@ Quick observations:
 
 ```{r}
 
-AsppCounts <- sppdata %>%
-  select(SppType,Academic, Government,NGO,Business,Private) %>%
-  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -SppType, -Asum) %>%
-  mutate(prop = count / Asum)  #calculate proportion
+sppdata %>%
+  select(SppType, count) %>%
+  mutate(prop = count/sum(count)) %>%
+  mutate(prop = round(prop,3)) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+    
 
-ggplot(AsppCounts, aes(x=SppType, y=count)) + geom_bar(stat="identity")
+ggplot(sppdata, aes(x=SppType, y=count)) + 
+  geom_bar(stat="identity") + 
+  geom_text(aes(x=SppType, y=max(count), label = paste0(round(100*count / sum(count),1), "%"), vjust=-0.25))
 
 ```
 
@@ -39,9 +44,16 @@ Quick observations:
 - By absolute numbers NGOs dominate study of birds 
 
 ```{r}
-ggplot(AsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(AsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+authorCounts <- sppdata %>%
+  select(SppType,Academic, Government,NGO,Business,Private) %>%
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
+
+ggplot(authorCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+
+ggplot(authorCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -57,15 +69,15 @@ Quick observations:
 - Birds, plants and inverts studies dominated by Lowland rural studies
 
 ```{r}
-lspsppCounts <- sppdata %>%
+lspCounts <- sppdata %>%
   select(SppType,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape, `Undefined LspType`,Other) %>%
-  mutate(Asum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -SppType, -Asum) %>%
-  mutate(prop = count / Asum)  #calculate proportion
+  mutate(sum = rowSums(.[2:8])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(lspsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(lspsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 ```
 
 ### Without 'Undefined LspType' and 'Other' landscape types
@@ -77,15 +89,15 @@ Quick observations:
 
 ```{r}
 
-lspsppCounts <- sppdata %>%
+lspCounts <- sppdata %>%
   select(SppType,`Upland rural`, `Lowland rural`, Urban,	Riverscape, Seascape) %>%
-  mutate(Asum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
-  gather(key = Type, value = count, -SppType, -Asum) %>%
-  mutate(prop = count / Asum)  #calculate proportion
+  mutate(sum = rowSums(.[2:6])) %>%   #calculate total for subsquent calcultation of proportion
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum)  #calculate proportion
 
-ggplot(lspsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(lspsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(lspCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -97,15 +109,15 @@ Quick observations:
 - Possibly surprisingly, plants do not have many RS studies
 
 ```{r}
-methodssppCounts <- sppdata %>%
+methodsCounts <- sppdata %>%
   select(SppType, Empirical, Theoretical, Qualitative, Quantitative, GIS, `Remote sensing`) %>%
-  mutate(yrsum = rowSums(.[2:7])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:7])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(methodssppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(methodsCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(methodssppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(methodsCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -117,15 +129,15 @@ Quick observations:
 - Fish have relatively high proportion of Global studies
 - Other species have reasonably evenly distributed proportions of scales
 ```{r}
-extentsppCounts <- sppdata %>%
+spatialCounts <- sppdata %>%
   select(SppType, Micro, Mini, Local, Regional, National, Continental, Global,`Undefined Extent`) %>%
-  mutate(yrsum = rowSums(.[2:9])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(extentsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(extentsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(spatialCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -137,16 +149,16 @@ Quick observations:
 
 - Difficult to see much; examine without 'undefined' 
 ```{r echo=F}
-temporalsppCounts <- sppdata %>%
+temporalCounts <- sppdata %>%
   select(SppType, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer, `Undefined Temporal`
 ) %>%
-  mutate(yrsum = rowSums(.[2:10])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(temporalsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(temporalsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -155,16 +167,16 @@ ggplot(temporalsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="id
 - Inverts dominated by annual (Yearly) studies, plus shorter studies
 - Plants have greatest proportions of longer studies (Decadal and Centuries) - makes sense given rates of change? 
 ```{r echo=F}
-temporalsppCounts <- sppdata %>%
+temporalCounts <- sppdata %>%
   select(SppType, Hours, Days, Weeks, Months, Years, Decades, Centuries, Longer 
 ) %>%
-  mutate(yrsum = rowSums(.[2:9])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:9])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(temporalsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(temporalsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(temporalCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -175,17 +187,17 @@ Quick observations:
 - Humans have a relatively large proportion of Ecosystem Services studies (not surprising?)
 - Plants have largest number of LUCC studies
 ```{r}
-conceptsppCounts <- sppdata %>%
+conceptCounts <- sppdata %>%
   select(SppType, `PPS of landscapes`,
 `Connectivity and fragmentation`, `Scale and scaling`,`Spatial analysis and modeling`,LUCC,`History and legacy`,`Climate change interactions`,`Ecosystem services`,`Landscape sustainability`,`Accuracy and uncertainty`
 ) %>%
-  mutate(yrsum = rowSums(.[2:11])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:11])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(conceptsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(conceptsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(conceptCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
@@ -198,16 +210,16 @@ Quick observations:
 - Birds, Inverts and Mammals dominates by biodiveristy and Management and Conservation studies
 
 ```{r}
-othCsppCounts <- sppdata %>%
+othCCounts <- sppdata %>%
   select(SppType, `Green Infrastructure`,`Planning and Architecture`,`Management and Conservation`,`Cultural Landscapes`,`Socio-economic Dimensions`,Biodiversity,`Landscape Assessment`,`Catchment Based Approach`,`Invasives Pests Diseases`
 ) %>%
-  mutate(yrsum = rowSums(.[2:10])) %>%
-  gather(key = Type, value = count, -SppType, -yrsum) %>%
-  mutate(prop = count / yrsum) 
+  mutate(sum = rowSums(.[2:10])) %>%
+  gather(key = Type, value = count, -SppType, -sum) %>%
+  mutate(prop = count / sum) 
 
-ggplot(othCsppCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(othCCounts, aes(x=SppType, y=count, fill=Type)) + geom_bar(stat="identity", colour="white")
 
-ggplot(othCsppCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
+ggplot(othCCounts, aes(x=SppType, y=prop, fill=Type)) + geom_bar(stat="identity", colour="white")
 
 ```
 
